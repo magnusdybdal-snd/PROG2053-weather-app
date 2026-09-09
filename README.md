@@ -1,4 +1,4 @@
-# Explore Nature
+# Prog2053 oblig
 
 A multi-page website built for NTNU's PROG2053 course, showcasing dynamic content loading with vanilla JavaScript.
 
