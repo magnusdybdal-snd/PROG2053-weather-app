@@ -2,10 +2,16 @@
 //          JAVASCRIPT FOR DYNAMIC POST LOADING            
 //#######################################################
 
+let postsLoaded = 0;
+let isFetchingPosts = false;
+const limit = 9;
+
 function fetchPosts() {
-    limit = 9;
-    // Added limit handling to the fetch instead of as a loop in the function to limit posts created
-    fetch(`https://jsonplaceholder.typicode.com/posts?_limit=${limit}`) 
+    if (isFetchingPosts) return;
+    isFetchingPosts = true;
+
+    // _start offsets the request so each call fetches the next page instead of repeating the first 9
+    fetch(`https://jsonplaceholder.typicode.com/posts?_start=${postsLoaded}&_limit=${limit}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error("Error with the status: " + response.status);
@@ -25,6 +31,16 @@ function fetchPosts() {
                 article.appendChild(title);
                 article.appendChild(body);
                 container.appendChild(article);
+        }
+
+        postsLoaded += posts.length;
+        isFetchingPosts = false;
+
+        // On tall viewports the page may still have no scrollbar after this batch,
+        // meaning the user could never trigger a scroll event to load more. Keep
+        // fetching until content overflows the viewport (or the API runs dry).
+        if (posts.length > 0 && document.body.scrollHeight <= window.innerHeight) {
+            fetchPosts();
         }
     })
 }
